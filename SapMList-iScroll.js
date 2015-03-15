@@ -32,35 +32,36 @@ var _readScriptPath = function () {
 /** end of path recognition */
 
 /**
- * Force enablement of iScroll plugin for mobile scrolling in Design Studio on iOS devices 
+ * Force enablement of iScroll plugin for scroll 
  * 
  * UI5 activates the iScroll.js third-party library (included with UI5) for mobile scrolling for iOS Versions <=6.  
  * However, for iOS >6 the native browser scrolling is invoked.  It seems that in Design Studio 1.4
  * the native scrolling is suppressed on mobile devices.  The following code is a workaround that
- * forces the iScroll functionality to be invoked at all times regardless of the iOS version.
- * The side effect of using iScroll is that although scrolling is enabled on the desktop (via mouse wheel),
- * the scroll bar is not displayed.
+ * forces the iScroll functionality to be invoked only on mobile devices.
+ * Normal native scrolling functions as desired for desktop.
  * 
  */
-jQuery.sap.require("sap.m.Page");
-sap.m.Page.prototype.onBeforeRendering = function() {
-	if(this._oScroller && !this._hasScrolling()){
-		this._oScroller.destroy();
-		this._oScroller = null;
-	}
-	else if( this._hasScrolling() && !this._oScroller){
-		jQuery.sap.require("sap.ui.core.delegate.ScrollEnablement");
-		this._oScroller = new sap.ui.core.delegate.ScrollEnablement(this, this.getId() + "-scroll", {
-			horizontal: false,
-			vertical: true,
-			zynga: false,
-			iscroll: "force",	//this._bUseIScroll, //"force"
-			preventDefault: false,
-			nonTouchScrolling: "scrollbar", //true
-			scrollbarClass: "sapMScrollbar"
-		});
-	}
-};
+if( ! sap.ui.Device.system.desktop ){
+	jQuery.sap.require("sap.m.Page");
+	sap.m.Page.prototype.onBeforeRendering = function() {
+		if(this._oScroller && !this._hasScrolling()){
+			this._oScroller.destroy();
+			this._oScroller = null;
+		}
+		else if( this._hasScrolling() && !this._oScroller){
+			jQuery.sap.require("sap.ui.core.delegate.ScrollEnablement");
+			this._oScroller = new sap.ui.core.delegate.ScrollEnablement(this, this.getId() + "-scroll", {
+				horizontal: false,
+				vertical: true,
+				zynga: false,
+				iscroll: "force",	
+				preventDefault: false,
+				nonTouchScrolling: "scrollbar", 
+				scrollbarClass: "sapMScrollbar"
+			});
+		}
+	};
+}
 /**
  * End of iScroll enablement code
  */
